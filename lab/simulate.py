@@ -19,6 +19,21 @@ def _draw_uniform(profile: GameProfile, rng: random.Random) -> list[int]:
     return sample_uniform(profile, rng)
 
 
+def auto_ticket(profile: GameProfile, seed: int) -> list[int]:
+    """Boleto al azar cuando el usuario no ingresa uno.
+
+    Usa una semilla derivada y distinta a la de la simulación: con la misma,
+    el primer sorteo simulado repetiría el boleto y mostraría un premio falso.
+    """
+    return sample_uniform(profile, random.Random(f"boleto:{seed}"))
+
+
+def _as_rng_state(state: Any) -> tuple:
+    # json.dumps convierte las tuplas de getstate() en listas.
+    version, internal, gauss = state
+    return (version, tuple(internal), gauss)
+
+
 def run_monte_carlo(
     profile: GameProfile,
     n_sim: int,
@@ -31,6 +46,7 @@ def run_monte_carlo(
     start_done: int = 0,
     start_hits: dict[int, int] | None = None,
     start_rng_state: Any = None,
+    start_ticket_hits: list[int] | None = None,
 ) -> dict:
     if n_sim < 1 or n_sim > MAX_N:
         raise ValueError(f"Simulaciones entre 1 y {MAX_N} (modo detallado: {DETAILED_N}).")
@@ -38,12 +54,18 @@ def run_monte_carlo(
         raise ValueError("Necesitas al menos un boleto.")
     rng = random.Random(seed)
     if start_rng_state is not None:
-        rng.setstate(start_rng_state)
+        rng.setstate(_as_rng_state(start_rng_state))
     table = build_probability_table(profile)
-    hits = dict(start_hits or {j: 0 for j in range(table.support[0], table.support[1] + 1)})
+    hits = {j: 0 for j in range(table.support[0], table.support[1] + 1)}
+    # Un checkpoint leído desde JSON trae las llaves como texto.
+    hits.update({int(k): int(v) for k, v in (start_hits or {}).items()})
     started = time.monotonic()
     done = start_done
     ticket_hits = [0] * len(tickets)
+    if start_ticket_hits is not None:
+        if len(start_ticket_hits) != len(tickets):
+            raise ValueError("El checkpoint no corresponde a estos boletos.")
+        ticket_hits = [int(h) for h in start_ticket_hits]
 
     while done < n_sim:
         if should_cancel and should_cancel():
@@ -114,6 +136,7 @@ def _pack(profile, n_sim, seed, tickets, table, hits, ticket_hits, done, started
         "checkpoint": {
             "done": done,
             "hits": hits,
+            "ticket_hits": ticket_hits,
             "rng_state": rng.getstate(),
         },
         "limits": {"quick": QUICK_N, "detailed": DETAILED_N, "max": MAX_N},

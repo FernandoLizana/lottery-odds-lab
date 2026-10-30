@@ -215,9 +215,8 @@ def simulate():
             flash(str(exc), "danger")
             return redirect(url_for("lab.simulate", profile=profile.slug))
         if ticket is None:
-            from lab.combinations import sample_uniform
-            import random as _rnd
-            ticket = sample_uniform(profile, _rnd.Random(seed))
+            from lab.simulate import auto_ticket
+            ticket = auto_ticket(profile, seed)
 
         def work(job, progress_cb, should_cancel, should_pause=None):
             return run_monte_carlo(

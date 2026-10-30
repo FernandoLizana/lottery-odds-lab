@@ -256,7 +256,7 @@ scrap.py               Legado; credenciales solo por env; Flask no lo llama
 python -m pytest -q
 ```
 
-Última corrida en este entorno: **41 passed**.
+Última corrida en este entorno: **28 passed**.
 
 ---
 
@@ -277,10 +277,8 @@ El árbol actual **no** contiene:
 | Resultados oficiales | `historico.csv` | Sí (públicos) |
 | Demos | `samples/demo/` | Sí (sintéticos) |
 
-**Historial git:** el commit inicial todavía puede contener un RUT/clave y una
-ruta Windows. El código nuevo ya no. **Cambia esa contraseña en el servicio
-real** (esta herramienta no puede rotarla por ti). Reescribir el historial
-de `main` exige un force-push; no se hace hasta que lo pidas explícitamente.
+**Historial git:** este repositorio público se publicó con historial nuevo.
+Ningún commit contiene RUT, claves ni rutas locales.
 
 Servidor: solo `127.0.0.1`. Sin telemetría.
 
@@ -288,7 +286,7 @@ Servidor: solo `127.0.0.1`. Sin telemetría.
 
 ## Repositorio
 
-- Público (historial limpio): [github.com/FernandoLizana/loteria-lab](https://github.com/FernandoLizana/loteria-lab)
+- Público (historial limpio): [github.com/FernandoLizana/lottery-odds-lab](https://github.com/FernandoLizana/lottery-odds-lab)
 - El remoto privado original no se publica.
 
 ---
