@@ -49,12 +49,9 @@ class Config:
         "triples": 0.6,
     }
 
-    # Punto genérico de Santiago (centro). Sobrescribible con .env, sin datos personales.
-    ASTRO_LATITUDE = _env_float("ASTRO_LATITUDE", -33.4489)
-    ASTRO_LONGITUDE = _env_float("ASTRO_LONGITUDE", -70.6693)
-    ASTRO_LOCATION_NAME = os.environ.get("ASTRO_LOCATION_NAME", "Santiago, Chile")
-    ASTRO_TIMEZONE = os.environ.get("ASTRO_TIMEZONE", "America/Santiago")
-    ASTRO_DRAW_HOUR = _env_int("ASTRO_DRAW_HOUR", 22)
-    ASTRO_DRAW_MINUTE = _env_int("ASTRO_DRAW_MINUTE", 30)
+    # Horario del sorteo. Sobrescribible con .env.
+    DRAW_TIMEZONE = os.environ.get("DRAW_TIMEZONE", "America/Santiago")
+    DRAW_HOUR = _env_int("DRAW_HOUR", 22)
+    DRAW_MINUTE = _env_int("DRAW_MINUTE", 30)
     # Miércoles, viernes y domingo (date.weekday(): lun=0 … dom=6)
-    ASTRO_DRAW_WEEKDAYS = (2, 4, 6)
+    DRAW_WEEKDAYS = (2, 4, 6)

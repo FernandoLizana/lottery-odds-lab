@@ -44,5 +44,4 @@ experiment_*.csv
 research/_feature_cache.npz
 research/canvas_data.json
 research/audit_console.txt
-research/tarot_report.json
 research/color_report.json

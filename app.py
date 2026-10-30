@@ -36,13 +36,7 @@ from services.job_runner import job_runner
 from services.logging_setup import setup_logging
 from services.portfolio_service import build_portfolio
 from services.scoring_service import normalize_weights, score_sample
-from services.astrology_service import (
-    format_draw_label,
-    next_draw_datetime,
-    run_astrology_experiment,
-)
-from services.lunar_service import run_lunar_experiment
-from services.tarot_service import run_tarot_experiment
+from services.draw_calendar import format_draw_label, next_draw_datetime
 from services.statistical_seed_service import generate_seed_candidates
 from services.lottery_catalog_service import seed_lottery_catalog
 from services.lottery_routes import lottery_bp
@@ -297,10 +291,8 @@ def register_routes(app: Flask) -> None:
                 "la misma probabilidad teórica (1 / 4.457.400)."
             ),
             "default_weights": Config.DEFAULT_WEIGHTS,
-            "default_astro_lat": Config.ASTRO_LATITUDE,
-            "default_astro_lon": Config.ASTRO_LONGITUDE,
             "next_draw_label": format_draw_label(next_draw_datetime()),
-            "astro_draw_time": f"{Config.ASTRO_DRAW_HOUR:02d}:{Config.ASTRO_DRAW_MINUTE:02d}",
+            "draw_time": f"{Config.DRAW_HOUR:02d}:{Config.DRAW_MINUTE:02d}",
         }
 
     @app.route("/")
@@ -523,169 +515,6 @@ def register_routes(app: Flask) -> None:
                 "experiment_id": exp.id,
                 "count": len(results),
                 "seed_sha256": seed_info["sha256"],
-            }
-
-        job_runner.run(app, job.id, work)
-        return redirect(url_for("job_status", job_id=job.id))
-
-    @app.route("/astrology-predict", methods=["POST"])
-    def astrology_predict():
-        draws = _all_draws_ordered()
-        if len(draws) < 20:
-            flash("Necesitas al menos 20 sorteos cargados para la predicción astrológica.", "warning")
-            return redirect(url_for("upload"))
-
-        sample_size = int(request.form.get("sample_size") or 20_000)
-        sample_size = max(1_000, min(sample_size, 200_000))
-        blend = float(request.form.get("blend") or 0.35)
-        blend = max(0.0, min(blend, 1.0))
-        seed = int(request.form.get("seed") or 42)
-        target = next_draw_datetime()
-        weights = normalize_weights(None)
-        job = job_runner.create_job("astrology")
-
-        def work(job_obj, progress_cb, should_cancel):
-            progress_cb(1.0, "Consultando histórico remoto (kinohistorico.cl)")
-            sync_info = _sync_remote_latest_draw()
-            if should_cancel():
-                return {"cancelled": True}
-
-            history = _all_draws_ordered()
-            metrics, results = run_astrology_experiment(
-                history,
-                target_dt=target,
-                history_sync=sync_info,
-                sample_size=sample_size,
-                seed=seed,
-                blend=blend,
-                weights=weights,
-                top_k=20,
-                progress_cb=progress_cb,
-                should_cancel=should_cancel,
-            )
-            exp = _save_experiment(
-                name=f"Astrología próximo sorteo {target.date().isoformat()}",
-                kind="astrology",
-                seed=seed,
-                sample_size=sample_size,
-                ticket_count=None,
-                max_overlap=None,
-                weights=weights,
-                metrics=metrics,
-                results=results,
-            )
-            return {
-                "experiment_id": exp.id,
-                "count": len(results),
-                "pattern_count": len(metrics.get("patterns", [])),
-                "target_draw_datetime": metrics.get("target_draw_datetime"),
-                "history_freshness": metrics.get("history_freshness"),
-            }
-
-        job_runner.run(app, job.id, work)
-        return redirect(url_for("job_status", job_id=job.id))
-
-    @app.route("/lunar-predict", methods=["POST"])
-    def lunar_predict():
-        draws = _all_draws_ordered()
-        if len(draws) < 20:
-            flash("Necesitas al menos 20 sorteos cargados para la generación lunar.", "warning")
-            return redirect(url_for("upload"))
-
-        sample_size = int(request.form.get("sample_size") or 20_000)
-        sample_size = max(1_000, min(sample_size, 200_000))
-        seed = int(request.form.get("seed") or 42)
-        target = next_draw_datetime()
-        job = job_runner.create_job("lunar")
-
-        def work(job_obj, progress_cb, should_cancel):
-            progress_cb(1.0, "Consultando histórico remoto (kinohistorico.cl)")
-            sync_info = _sync_remote_latest_draw()
-            if should_cancel():
-                return {"cancelled": True}
-
-            history = _all_draws_ordered()
-            metrics, results = run_lunar_experiment(
-                history,
-                target_dt=target,
-                history_sync=sync_info,
-                sample_size=sample_size,
-                seed=seed,
-                top_k=20,
-                progress_cb=progress_cb,
-                should_cancel=should_cancel,
-            )
-            exp = _save_experiment(
-                name=f"Lunar simple {target.date().isoformat()}",
-                kind="lunar",
-                seed=seed,
-                sample_size=sample_size,
-                ticket_count=None,
-                max_overlap=None,
-                weights={"mode": "lunar"},
-                metrics=metrics,
-                results=results,
-            )
-            return {
-                "experiment_id": exp.id,
-                "count": len(results),
-                "pattern_count": len(metrics.get("patterns", [])),
-                "target_draw_datetime": metrics.get("target_draw_datetime"),
-                "history_freshness": metrics.get("history_freshness"),
-                "mode": "lunar",
-            }
-
-        job_runner.run(app, job.id, work)
-        return redirect(url_for("job_status", job_id=job.id))
-
-    @app.route("/tarot-predict", methods=["POST"])
-    def tarot_predict():
-        draws = _all_draws_ordered()
-        if len(draws) < 20:
-            flash("Necesitas al menos 20 sorteos cargados para el ejercicio tarot.", "warning")
-            return redirect(url_for("upload"))
-
-        sample_size = int(request.form.get("sample_size") or 20_000)
-        sample_size = max(1_000, min(sample_size, 200_000))
-        seed = int(request.form.get("seed") or 42)
-        target = next_draw_datetime()
-        job = job_runner.create_job("tarot")
-
-        def work(job_obj, progress_cb, should_cancel):
-            progress_cb(1.0, "Consultando histórico remoto (kinohistorico.cl)")
-            sync_info = _sync_remote_latest_draw()
-            if should_cancel():
-                return {"cancelled": True}
-
-            history = _all_draws_ordered()
-            metrics, results = run_tarot_experiment(
-                history,
-                target_dt=target,
-                history_sync=sync_info,
-                sample_size=sample_size,
-                seed=seed,
-                top_k=20,
-                progress_cb=progress_cb,
-                should_cancel=should_cancel,
-            )
-            exp = _save_experiment(
-                name=f"Tarot–astro {target.date().isoformat()}",
-                kind="tarot",
-                seed=seed,
-                sample_size=sample_size,
-                ticket_count=None,
-                max_overlap=None,
-                weights={"mode": "tarot"},
-                metrics=metrics,
-                results=results,
-            )
-            return {
-                "experiment_id": exp.id,
-                "count": len(results),
-                "pattern_count": len(metrics.get("patterns", [])),
-                "target_draw_datetime": metrics.get("target_draw_datetime"),
-                "history_freshness": metrics.get("history_freshness"),
-                "mode": "tarot",
             }
 
         job_runner.run(app, job.id, work)

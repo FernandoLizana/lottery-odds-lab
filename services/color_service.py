@@ -23,7 +23,7 @@ import numpy as np
 
 from config import Config
 from services.combination_service import features_for_combo, sample_combinations
-from services.lunar_service import GEOMETRIC_TIEBREAK_WEIGHT, _geometric_tiebreak
+from services.draw_calendar import GEOMETRIC_TIEBREAK_WEIGHT, _geometric_tiebreak
 
 PIGMENTS: tuple[tuple[str, range, str], ...] = (
     ("rojo", range(1, 6), "#e23d3d"),
@@ -203,7 +203,7 @@ def run_color_experiment(
     should_cancel: Callable[[], bool] | None = None,
 ) -> tuple[dict, list[dict]]:
     """Genera combinaciones cercanas a un tono. No cambia la equiprobabilidad."""
-    from services.astrology_service import format_draw_label, next_draw_datetime
+    from services.draw_calendar import format_draw_label, next_draw_datetime
 
     target = resolve_target_hue(draws, mode=mode, target_hue=target_hue)
     hue = float(target["hue_deg"])

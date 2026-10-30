@@ -29,7 +29,7 @@ no— a partir de datos, fórmulas y simulaciones.
 | **Aprender haciendo** | Desafíos, laboratorio de sesgos sintéticos y gastos ficticios (sin dinero real). |
 | **Reproducible** | Semillas, perfiles versionados, cuaderno con ejecuciones que no se sobrescriben. |
 | **Offline del núcleo** | Bootstrap y Chart.js van en `static/vendor/`. No hace falta CDN para usar la app. |
-| **Sin secretos en el código** | Claves solo en `.env` (gitignorado). Default astro = Santiago centro, no una vivienda. |
+| **Sin secretos en el código** | Claves solo en `.env` (gitignorado). |
 
 Si buscas un sistema para “ganar la lotería”, esto no es eso. Si quieres un
 laboratorio claro para explorar el azar en distintos juegos, sí.
@@ -90,8 +90,7 @@ Abre [http://127.0.0.1:5000/inicio](http://127.0.0.1:5000/inicio).
 Comprobado en **Windows 10/11 + Python 3.11**. Linux/macOS usan el mismo stack;
 no se ejecutaron en esta máquina.
 
-Copia `.env.example` → `.env` y cambia `SECRET_KEY`. Coordenadas astro son
-opcionales y deben ser **genéricas** (nunca GPS de una casa).
+Copia `.env.example` → `.env` y cambia `SECRET_KEY`.
 
 ---
 
@@ -206,7 +205,7 @@ Reglas que el código aplica:
 ### Kino clásico (se conserva)
 
 Dashboard, análisis, colores, puntuar, backtesting, portafolio, resultados,
-astro/luna/tarot (experimentales), otras loterías.
+otras loterías.
 
 ### Perfiles de juego
 

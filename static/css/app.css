@@ -77,44 +77,6 @@ body {
   gap: .75rem;
 }
 
-.tarot-spread {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: .75rem;
-}
-
-.tarot-card {
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 1rem .85rem;
-  background: #121821;
-  min-height: 10.5rem;
-}
-
-.tarot-card .role {
-  color: var(--muted);
-  font-size: .75rem;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-}
-
-.tarot-card .name {
-  font-size: 1.15rem;
-  font-weight: 700;
-  margin: .35rem 0 .25rem;
-}
-
-.tarot-card .source {
-  color: var(--muted);
-  font-size: .8rem;
-}
-
-@media (max-width: 720px) {
-  .tarot-spread {
-    grid-template-columns: 1fr;
-  }
-}
-
 .color-arc-stage {
   position: relative;
   width: min(100%, 520px);

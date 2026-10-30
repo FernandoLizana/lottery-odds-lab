@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parents[1]
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
-from research.tarot_synchronicity import load_longest_history  # noqa: E402
+from research.history import load_longest_history  # noqa: E402
 from services.color_service import PIGMENT_NAMES, combo_color  # noqa: E402
 
 REPORT_PATH = BASE_DIR / "research" / "color_report.json"

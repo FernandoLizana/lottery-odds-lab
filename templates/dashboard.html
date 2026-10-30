@@ -14,25 +14,6 @@
       <input type="hidden" name="sample_size" value="20000">
       <button class="btn btn-success" type="submit">Generar semilla estadística</button>
     </form>
-    <form method="post" action="{{ url_for('astrology_predict') }}">
-      <input type="hidden" name="sample_size" value="20000">
-      <input type="hidden" name="blend" value="0.35">
-      <button class="btn btn-warning" type="submit" title="Experimental · sin garantía">
-        Predicción astrológica experimental
-      </button>
-    </form>
-    <form method="post" action="{{ url_for('lunar_predict') }}">
-      <input type="hidden" name="sample_size" value="20000">
-      <button class="btn btn-outline-warning" type="submit" title="Solo Luna · experimental">
-        Generación lunar simple
-      </button>
-    </form>
-    <form method="post" action="{{ url_for('tarot_predict') }}">
-      <input type="hidden" name="sample_size" value="20000">
-      <button class="btn btn-outline-info" type="submit" title="Tarot anclado al cielo · ejercicio">
-        Tirada tarot–astro
-      </button>
-    </form>
   </div>
 </div>
 
@@ -40,26 +21,8 @@
   La semilla generada pertenece al modelo estadístico y no corresponde
   necesariamente a la semilla real utilizada por el sorteo.
 </div>
-<div class="alert alert-warning py-2 small">
-  <strong>Módulo astrológico experimental:</strong> explora correlaciones históricas
-  con variables astronómicas. <em>No demuestra causalidad</em> y
-  <em>no garantiza</em> aciertos en el Kino.
-  <br>
-  Predicción calculada para el próximo sorteo:
-  <strong>{{ next_draw_label }}</strong>
-  · lat {{ default_astro_lat }}, lon {{ default_astro_lon }}.
-  Al pulsar el botón se consulta kinohistorico.cl para actualizar el histórico local.
-</div>
 <div class="alert alert-secondary py-2 small">
-  <strong>Generación lunar simple:</strong> usa solo variables de la Luna
-  (fase, distancia, nodos, lunaciones). Modelo experimental; no cambia la
-  equiprobabilidad teórica de las combinaciones.
-</div>
-<div class="alert alert-info py-2 small">
-  <strong>Tirada tarot–astro:</strong> traduce el cielo del próximo sorteo a
-  3 cartas (energía solar, ancla lunar, clima de fase) con correspondencias
-  Golden Dawn. Mide si esa ancla se sincronicó con el Kino. No se baraja:
-  la tirada es una función del cielo, no un oráculo aleatorio.
+  Próximo sorteo: <strong>{{ next_draw_label }}</strong>.
 </div>
 
 <div class="row g-3 mb-4">
